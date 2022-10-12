@@ -1,0 +1,6 @@
+spring:
+  couchbase:
+    connection-string: "couchbase://localhost"
+    username: "admin"
+    password: "password"
+    bucket: "couchbase_course_bucket"
