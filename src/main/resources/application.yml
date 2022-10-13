@@ -1,6 +1,11 @@
+logging:
+  level:
+    com:
+      couchbase: INFO
+
 spring:
   couchbase:
-    connection-string: "couchbase://localhost"
+    connection-string: "couchbase://127.0.0.1"
     username: "admin"
     password: "password"
     bucket: "couchbase_course_bucket"

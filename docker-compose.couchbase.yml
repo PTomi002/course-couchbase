@@ -1,42 +1,20 @@
 version: "3"
 
 services:
-  couchbase_1:
-    container_name: couchbase_1
-    image: couchbase/server
-    volumes:
-      - couchbase_1_data:/opt/couchbase/var
-    networks:
-      - couchbase-net
-
-  couchbase_2:
-    container_name: couchbase_2
-    image: couchbase/server
-    volumes:
-      - couchbase_2_data:/opt/couchbase/var
-    networks:
-      - couchbase-net
-
   # UI is available: http://localhost:8091/ui/index.html
-  couchbase_3:
-    container_name: couchbase_3
-    image: couchbase/server
+  couchbase:
+    container_name: couchbase
+    image: couchbase:community-7.1.1
     volumes:
-      - couchbase_3_data:/opt/couchbase/var
+      - couchbase_data:/opt/couchbase/var
     networks:
       - couchbase-net
     ports:
-      - 8091:8091
-      - 8092:8092
-      - 8093:8093
+      - 8091-8093:8091-8093
       - 11210:11210
 
 volumes:
-  couchbase_1_data:
-    driver: local
-  couchbase_2_data:
-    driver: local
-  couchbase_3_data:
+  couchbase_data:
     driver: local
 
 networks:
