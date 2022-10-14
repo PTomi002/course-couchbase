@@ -9,6 +9,8 @@ import org.springframework.data.couchbase.repository.Scope;
 
 import java.util.List;
 
+// should be generated from open api
+// validated with @JsonProperty(required = "true", ...)
 @Document
 @Scope(value = "projects")
 @Collection(value = "project")
