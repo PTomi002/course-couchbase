@@ -2,7 +2,8 @@ package hu.ptomi.course.couchbase.controller;
 
 import hu.ptomi.course.couchbase.model.Project;
 import hu.ptomi.course.couchbase.model.Task;
-import hu.ptomi.course.couchbase.service.ProjectsService;
+import hu.ptomi.course.couchbase.service.AdministrationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -11,12 +12,15 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
-@RestController
-public class ProjectsController {
-    private final ProjectsService projectsService;
+import static java.util.Objects.isNull;
 
-    public ProjectsController(ProjectsService projectsService) {
-        this.projectsService = projectsService;
+@RestController
+public class AdministrationController {
+    private final AdministrationService administrationService;
+
+    @Autowired
+    public AdministrationController(AdministrationService administrationService) {
+        this.administrationService = administrationService;
     }
 
     @PostMapping(path = "/projects")
@@ -24,7 +28,7 @@ public class ProjectsController {
             @Valid @RequestBody Project project,
             UriComponentsBuilder b
     ) {
-        return projectsService
+        return administrationService
                 .createProject(project)
                 .map(p ->
                         ResponseEntity
@@ -33,17 +37,25 @@ public class ProjectsController {
                 );
     }
 
-    @GetMapping(path = "/projects")
-    public Flux<Project> findAllProject() {
-        return projectsService.findAllProject();
-    }
-
     @GetMapping(path = "/projects/{id}")
     public Mono<ResponseEntity<Project>> findProjectById(@PathVariable String id) {
-        return projectsService
+        return administrationService
                 .findProjectById(id)
                 .map(ResponseEntity::ok)
                 .switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
+    }
+
+    @GetMapping(path = "/projects")
+    public Flux<Project> findProjectsBy(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "like", required = false, defaultValue = "false") boolean isLike
+    ) {
+        if (isNull(name) || name.isBlank())
+            return administrationService.findAllProject();
+        else if (isLike)
+            return administrationService.findProjectByNameLike("%" + name + "%");
+        else
+            return administrationService.findProjectByName(name);
     }
 
     @PostMapping(path = "/tasks")
@@ -51,7 +63,7 @@ public class ProjectsController {
             @Valid @RequestBody Task task,
             UriComponentsBuilder b
     ) {
-        return projectsService
+        return administrationService
                 .createTask(task)
                 .map(t ->
                         ResponseEntity
@@ -61,13 +73,13 @@ public class ProjectsController {
     }
 
     @GetMapping(path = "/tasks")
-    public Flux<Task> findAllTask() {
-        return projectsService.findAllTask();
+    public Flux<Task> findTasksBy() {
+        return administrationService.findAllTask();
     }
 
     @GetMapping(path = "/tasks/{id}")
     public Mono<ResponseEntity<Task>> findTaskById(@PathVariable String id) {
-        return projectsService
+        return administrationService
                 .findTaskById(id)
                 .map(ResponseEntity::ok)
                 .switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));

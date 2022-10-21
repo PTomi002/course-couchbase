@@ -3,6 +3,9 @@ logging:
     com:
       couchbase: INFO
 
+server:
+  port: 8081
+
 spring:
   couchbase:
     connection-string: "couchbase://127.0.0.1"

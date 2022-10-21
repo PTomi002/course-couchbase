@@ -1,6 +1,6 @@
 package hu.ptomi.course.couchbase.controller.errorhandler;
 
-import hu.ptomi.course.couchbase.controller.ProjectsController;
+import hu.ptomi.course.couchbase.controller.AdministrationController;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-@RestControllerAdvice(basePackageClasses = {ProjectsController.class})
-public class ProjectsErrorHandler {
+@RestControllerAdvice(basePackageClasses = {AdministrationController.class})
+public class AdministrationErrorHandler {
 
     @ExceptionHandler(value = {DuplicateKeyException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)

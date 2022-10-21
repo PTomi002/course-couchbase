@@ -4,16 +4,18 @@ import hu.ptomi.course.couchbase.model.Project;
 import hu.ptomi.course.couchbase.model.Task;
 import hu.ptomi.course.couchbase.repository.ProjectRepository;
 import hu.ptomi.course.couchbase.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class ProjectsServiceImpl implements ProjectsService {
+public class AdministrationService implements ProjectService, TaskService {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
 
-    public ProjectsServiceImpl(ProjectRepository projectRepository, TaskRepository taskRepository) {
+    @Autowired
+    public AdministrationService(ProjectRepository projectRepository, TaskRepository taskRepository) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
     }
@@ -41,6 +43,16 @@ public class ProjectsServiceImpl implements ProjectsService {
     @Override
     public Flux<Project> findAllProject() {
         return projectRepository.findAll();
+    }
+
+    @Override
+    public Flux<Project> findProjectByName(String name) {
+        return projectRepository.findByName(name);
+    }
+
+    @Override
+    public Flux<Project> findProjectByNameLike(String name) {
+        return projectRepository.findByNameLike(name);
     }
 
     @Override
