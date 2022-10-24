@@ -2,6 +2,9 @@ logging:
   level:
     com:
       couchbase: INFO
+    # To log generated Nickel queries
+    org.springframework.data.couchbase.repository.query: TRACE
+    org.springframework.data.couchbase.core: TRACE
 
 server:
   port: 8081

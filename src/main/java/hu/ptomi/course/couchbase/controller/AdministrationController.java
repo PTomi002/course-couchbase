@@ -23,6 +23,12 @@ public class AdministrationController {
         this.administrationService = administrationService;
     }
 
+    // Do not want to create endpoint for each api call.
+    @GetMapping("/test")
+    public Mono<Void> runSome() {
+        return administrationService.runOtherEndpoints();
+    }
+
     @PostMapping(path = "/projects")
     public Mono<ResponseEntity<Project>> createProject(
             @Valid @RequestBody Project project,
@@ -53,7 +59,7 @@ public class AdministrationController {
         if (isNull(name) || name.isBlank())
             return administrationService.findAllProject();
         else if (isLike)
-            return administrationService.findProjectByNameLike("%" + name + "%");
+            return administrationService.findProjectByNameLike(name);
         else
             return administrationService.findProjectByName(name);
     }
