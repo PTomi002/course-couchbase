@@ -1,5 +1,6 @@
 package hu.ptomi.course.couchbase.model;
 
+import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -11,6 +12,7 @@ import java.util.List;
 
 // should be generated from open api
 // validated with @JsonProperty(required = "true", ...)
+@Builder
 @Document
 @Scope(value = "projects")
 @Collection(value = "project")

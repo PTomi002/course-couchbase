@@ -14,6 +14,10 @@ import reactor.core.publisher.Mono;
 //      META(p).`cas` AS __cas
 @Repository
 public interface ProjectRepository extends ReactiveCouchbaseRepository<Project, String> {
+    // (0) default indexes
+    // CREATE INDEX default_project ON `couchbase_course_bucket`.`projects`.`project`(_class) WHERE _class='hu.ptomi.course.couchbase.model.Project'
+    // CREATE INDEX default_task ON `couchbase_course_bucket`.`projects`.`task`(_class) WHERE _class='hu.ptomi.course.couchbase.model.Task'
+
     // (1) simple queries
     // CREATE INDEX `find_by_name_index` ON `couchbase_course_bucket`.`projects`.`project`(name, _class) WHERE _class='hu.ptomi.course.couchbase.model.Project'
     // SELECT * FROM project p WHERE p.name="ProjectC" AND _class="hu.ptomi.course.couchbase.model.Project" ORDER BY cost ASC
@@ -45,6 +49,7 @@ public interface ProjectRepository extends ReactiveCouchbaseRepository<Project, 
 
     // (5) spring data projection
     // SELECT p.name, p.cost, META(p).`id` AS __id, META(p).`cas` AS __cas FROM project p WHERE `_class` = 'hu.ptomi.course.couchbase.model.Project' AND name = $1
+    // Should work with hu.ptomi.course.couchbase.model.view.SimpleProjectView.
     @Query("SELECT p._class, p.name, p.cost, META(p).`id` AS __id, META(p).`cas` AS __cas FROM project p WHERE `_class` = 'hu.ptomi.course.couchbase.model.Project' AND name = $1")
     Mono<Project> simpleProjectViewByName(String name);
 }

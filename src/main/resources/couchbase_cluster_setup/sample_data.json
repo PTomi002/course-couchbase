@@ -1,0 +1,95 @@
+[
+  {
+    "id": "1",
+    "name": "ProjectA",
+    "code": "A",
+    "description": "ProjectADescription",
+    "startDate": "2020-01-01",
+    "endDate": "2021-01-01",
+    "estimatedCost": 1000,
+    "countryList": [
+      "UK",
+      "USA",
+      "Kenya",
+      "Nambia"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "ProjectB",
+    "code": "B",
+    "description": "ProjectBDescription",
+    "startDate": "2021-01-01",
+    "endDate": "2022-01-01",
+    "estimatedCost": 2000,
+    "countryList": [
+      "France",
+      "UK",
+      "Japan",
+      "Peru"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "ProjectC",
+    "code": "C",
+    "description": "ProjectCDescription",
+    "startDate": "2020-01-01",
+    "endDate": "2022-01-01",
+    "estimatedCost": 3000,
+    "countryList": [
+      "France",
+      "USA",
+      "Jameica",
+      "Canada"
+    ]
+  },
+  {
+    "id": "1",
+    "projectId": "1",
+    "name": "ATask1",
+    "description": "ATask1Description",
+    "ownerName": "Tom",
+    "cost": 100
+  },
+  {
+    "id": "2",
+    "projectId": "1",
+    "name": "ATask2",
+    "description": "ATask2Description",
+    "ownerName": "Mark",
+    "cost": 50
+  },
+  {
+    "id": "3",
+    "projectId": "2",
+    "name": "BTask1",
+    "description": "BTask1Description",
+    "ownerName": "Mark",
+    "cost": 20
+  },
+  {
+    "id": "4",
+    "projectId": "3",
+    "name": "CTask1",
+    "description": "CTask1Description",
+    "ownerName": "Mark",
+    "cost": 40
+  },
+  {
+    "id": "5",
+    "projectId": "3",
+    "name": "CTask2",
+    "description": "CTask2Description",
+    "ownerName": "Tom",
+    "cost": 70
+  },
+  {
+    "id": "6",
+    "projectId": "3",
+    "name": "CTask3",
+    "description": "CTask3Description",
+    "ownerName": "Tom",
+    "cost": 80
+  }
+]

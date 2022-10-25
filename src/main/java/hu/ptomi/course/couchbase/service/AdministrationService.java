@@ -1,5 +1,10 @@
 package hu.ptomi.course.couchbase.service;
 
+import com.couchbase.client.core.cnc.events.transaction.TransactionLogEvent;
+import com.couchbase.client.java.ReactiveCollection;
+import com.couchbase.client.java.transactions.error.TransactionCommitAmbiguousException;
+import com.couchbase.client.java.transactions.error.TransactionFailedException;
+import com.couchbase.transactions.Transactions;
 import hu.ptomi.course.couchbase.model.Project;
 import hu.ptomi.course.couchbase.model.Task;
 import hu.ptomi.course.couchbase.repository.ProjectRepository;
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class AdministrationService implements ProjectService, TaskService {
 
@@ -18,10 +25,24 @@ public class AdministrationService implements ProjectService, TaskService {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
 
+    // these belong to the repo layer, but no intent to do it as keeping things simple as can be
+    private final Transactions transactions;
+    private final ReactiveCollection projects;
+    private final ReactiveCollection tasks;
+
     @Autowired
-    public AdministrationService(ProjectRepository projectRepository, TaskRepository taskRepository) {
+    public AdministrationService(
+            ProjectRepository projectRepository,
+            TaskRepository taskRepository,
+            Transactions transactions,
+            ReactiveCollection projects,
+            ReactiveCollection tasks
+    ) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
+        this.transactions = transactions;
+        this.projects = projects;
+        this.tasks = tasks;
     }
 
     public Mono<Void> runOtherEndpoints() {
@@ -50,6 +71,26 @@ public class AdministrationService implements ProjectService, TaskService {
                         projectRepository
                                 .simpleProjectViewByName("ProjectA")
                                 .doOnNext(coll -> logger.info("simpleProjectViewByName: " + coll))
+                )
+                .then(
+                        Mono.defer(() ->
+                                transactions.reactive()
+                                        .run(ctx -> {
+                                            var id = UUID.randomUUID().toString();
+                                            return ctx
+                                                    .insert(projects, id, generateProject())
+                                                    .then(ctx.insert(tasks, UUID.randomUUID().toString(), generateTask(id)))
+                                                    .then(ctx.commit());
+                                            // auto-rollback after lambda runs
+                                        })
+                                        .doOnError(err -> {
+                                            if (err instanceof TransactionCommitAmbiguousException) {
+                                                logCommitAmbiguousError((TransactionCommitAmbiguousException) err);
+                                            } else if (err instanceof TransactionFailedException) {
+                                                logFailure((TransactionFailedException) err);
+                                            }
+                                        })
+                        )
                 )
                 .then();
     }
@@ -92,5 +133,33 @@ public class AdministrationService implements ProjectService, TaskService {
     @Override
     public Flux<Task> findAllTask() {
         return taskRepository.findAll();
+    }
+
+    private Project generateProject() {
+        return Project.builder()
+                .name("name_" + UUID.randomUUID())
+                .build();
+    }
+
+    private Task generateTask(String pid) {
+        throw new RuntimeException("injected error to see rollback");
+//        return Task.builder()
+//                .name("name_" + UUID.randomUUID())
+//                .projectId(pid)
+//                .build();
+    }
+
+    private void logCommitAmbiguousError(TransactionCommitAmbiguousException err) {
+        logger.warn("Transaction possibly reached the commit point");
+        for (TransactionLogEvent msg : err.logs()) {
+            logger.warn(msg.toString());
+        }
+    }
+
+    private void logFailure(TransactionFailedException err) {
+        logger.warn("Transaction did not reach commit point");
+        for (TransactionLogEvent msg : err.logs()) {
+            logger.warn(msg.toString());
+        }
     }
 }
