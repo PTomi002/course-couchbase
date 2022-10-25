@@ -1,6 +1,7 @@
 [
   {
-    "id": "1",
+    "id": "project_1",
+    "type": "project",
     "name": "ProjectA",
     "code": "A",
     "description": "ProjectADescription",
@@ -15,7 +16,8 @@
     ]
   },
   {
-    "id": "2",
+    "id": "project_2",
+    "type": "project",
     "name": "ProjectB",
     "code": "B",
     "description": "ProjectBDescription",
@@ -30,7 +32,8 @@
     ]
   },
   {
-    "id": "3",
+    "id": "project_3",
+    "type": "project",
     "name": "ProjectC",
     "code": "C",
     "description": "ProjectCDescription",
@@ -45,48 +48,54 @@
     ]
   },
   {
-    "id": "1",
-    "projectId": "1",
+    "id": "task_1",
+    "type": "task",
+    "projectId": "project_1",
     "name": "ATask1",
     "description": "ATask1Description",
     "ownerName": "Tom",
     "cost": 100
   },
   {
-    "id": "2",
-    "projectId": "1",
+    "id": "task_2",
+    "type": "task",
+    "projectId": "project_1",
     "name": "ATask2",
     "description": "ATask2Description",
     "ownerName": "Mark",
     "cost": 50
   },
   {
-    "id": "3",
-    "projectId": "2",
+    "id": "task_3",
+    "type": "task",
+    "projectId": "project_2",
     "name": "BTask1",
     "description": "BTask1Description",
     "ownerName": "Mark",
     "cost": 20
   },
   {
-    "id": "4",
-    "projectId": "3",
+    "id": "task_4",
+    "type": "task",
+    "projectId": "project_3",
     "name": "CTask1",
     "description": "CTask1Description",
     "ownerName": "Mark",
     "cost": 40
   },
   {
-    "id": "5",
-    "projectId": "3",
+    "id": "task_5",
+    "type": "task",
+    "projectId": "project_3",
     "name": "CTask2",
     "description": "CTask2Description",
     "ownerName": "Tom",
     "cost": 70
   },
   {
-    "id": "6",
-    "projectId": "3",
+    "id": "task_6",
+    "type": "task",
+    "projectId": "project_3",
     "name": "CTask3",
     "description": "CTask3Description",
     "ownerName": "Tom",

@@ -76,10 +76,10 @@ public class AdministrationService implements ProjectService, TaskService {
                         Mono.defer(() ->
                                 transactions.reactive()
                                         .run(ctx -> {
-                                            var id = UUID.randomUUID().toString();
+                                            var id = "project_" + UUID.randomUUID();
                                             return ctx
                                                     .insert(projects, id, generateProject())
-                                                    .then(ctx.insert(tasks, UUID.randomUUID().toString(), generateTask(id)))
+                                                    .then(ctx.insert(tasks, "task_" + UUID.randomUUID(), generateTask(id)))
                                                     .then(ctx.commit());
                                             // auto-rollback after lambda runs
                                         })
@@ -138,15 +138,17 @@ public class AdministrationService implements ProjectService, TaskService {
     private Project generateProject() {
         return Project.builder()
                 .name("name_" + UUID.randomUUID())
+                .type("project")
                 .build();
     }
 
     private Task generateTask(String pid) {
-        throw new RuntimeException("injected error to see rollback");
-//        return Task.builder()
-//                .name("name_" + UUID.randomUUID())
-//                .projectId(pid)
-//                .build();
+        // throw new RuntimeException("injected error to see rollback");
+        return Task.builder()
+                .name("name_" + UUID.randomUUID())
+                .projectId(pid)
+                .type("task")
+                .build();
     }
 
     private void logCommitAmbiguousError(TransactionCommitAmbiguousException err) {

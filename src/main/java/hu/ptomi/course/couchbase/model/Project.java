@@ -19,6 +19,7 @@ import java.util.List;
 public record Project(
         // @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES,delimiter="::")
         @Id String id,
+        String type,
         String name,
         String code,
         @Field("desc") String description,

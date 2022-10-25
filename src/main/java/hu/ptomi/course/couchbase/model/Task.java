@@ -15,6 +15,7 @@ import org.springframework.data.couchbase.repository.Scope;
 public record Task(
         @Id String id,
         @Field("pid") String projectId,
+        String type,
         String name,
         @Field("desc") String description,
         String ownerName,
