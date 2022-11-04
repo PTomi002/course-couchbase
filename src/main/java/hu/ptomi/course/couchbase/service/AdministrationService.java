@@ -1,7 +1,10 @@
 package hu.ptomi.course.couchbase.service;
 
 import com.couchbase.client.core.cnc.events.transaction.TransactionLogEvent;
+import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ReactiveCollection;
+import com.couchbase.client.java.search.SearchQuery;
+import com.couchbase.client.java.search.result.ReactiveSearchResult;
 import com.couchbase.client.java.transactions.error.TransactionCommitAmbiguousException;
 import com.couchbase.client.java.transactions.error.TransactionFailedException;
 import com.couchbase.transactions.Transactions;
@@ -29,6 +32,7 @@ public class AdministrationService implements ProjectService, TaskService {
     private final Transactions transactions;
     private final ReactiveCollection projects;
     private final ReactiveCollection tasks;
+    private final Cluster cluster;
 
     @Autowired
     public AdministrationService(
@@ -36,13 +40,15 @@ public class AdministrationService implements ProjectService, TaskService {
             TaskRepository taskRepository,
             Transactions transactions,
             ReactiveCollection projects,
-            ReactiveCollection tasks
+            ReactiveCollection tasks,
+            Cluster cluster
     ) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
         this.transactions = transactions;
         this.projects = projects;
         this.tasks = tasks;
+        this.cluster = cluster;
     }
 
     public Mono<Void> runOtherEndpoints() {
@@ -128,6 +134,37 @@ public class AdministrationService implements ProjectService, TaskService {
     @Override
     public Flux<Project> findProjectByNameLike(String name) {
         return projectRepository.findByNameLikeOrderByEstimatedCostAsc("%" + name + "%");
+    }
+
+    // index = when checked, the field is indexed; when unchecked, the field is not indexed
+    // store = the original field content is included in the FTS index (Include In Search Result, Highlight)
+    // include terms vector = term vectors are the locations of terms in a particular field (Highlight, Phrase Search)
+    // include in _all field = Inclusion means when query strings are used to specify searches,
+    //      the text in the current field is searchable without the field name requiring a prefix.
+    //      For Example, a search on 'name:ProjectC' can be accomplished simply by specifying the word 'ProjectC'.
+    // include doc value = include the value for each instance of the field in the index (Facet, Search Query Sorting)
+    @Override
+    public Flux<Project> ftsMatchQueries(String name) {
+        // SearchQuery.match(name).field("_all").fuzziness(0);
+        // _all = special field to search in all field included in the index
+        //          e.g.: we have 'name', but can have any other value included in the index like 'description'
+        //          we should check it on in the couchbase ui ('include in _all field')
+        var matcher = SearchQuery.match(name).field("name").fuzziness(0);
+        return cluster.reactive()
+                .searchQuery("projects_fts_idx", matcher)
+                .flatMapMany(ReactiveSearchResult::rows)
+                .doOnNext(searchRow -> logger.info("row: " + searchRow.toString()))
+                .thenMany(Flux.empty());
+    }
+
+    @Override
+    public Flux<Project> ftsMatchPhraseQueries(String name) {
+        var matcher = SearchQuery.matchPhrase(name).field("name");
+        return cluster.reactive()
+                .searchQuery("projects_fts_idx", matcher)
+                .flatMapMany(ReactiveSearchResult::rows)
+                .doOnNext(searchRow -> logger.info("row: " + searchRow.toString()))
+                .thenMany(Flux.empty());
     }
 
     @Override

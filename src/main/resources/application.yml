@@ -1,7 +1,6 @@
 logging:
   level:
     com.couchbase: INFO
-    com.couchbase.transactions: DEBUG
     # To log generated Nickel queries
     org.springframework.data.couchbase.repository.query: TRACE
     org.springframework.data.couchbase.core: TRACE

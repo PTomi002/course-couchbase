@@ -14,4 +14,9 @@ public interface ProjectService {
     Flux<Project> findProjectByName(String name);
 
     Flux<Project> findProjectByNameLike(String name);
+
+    // these should go to a different interface as FTS
+    Flux<Project> ftsMatchQueries(String name);
+
+    Flux<Project> ftsMatchPhraseQueries(String name);
 }

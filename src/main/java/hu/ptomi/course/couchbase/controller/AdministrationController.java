@@ -3,6 +3,8 @@ package hu.ptomi.course.couchbase.controller;
 import hu.ptomi.course.couchbase.model.Project;
 import hu.ptomi.course.couchbase.model.Task;
 import hu.ptomi.course.couchbase.service.AdministrationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,9 @@ import static java.util.Objects.isNull;
 
 @RestController
 public class AdministrationController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdministrationService.class);
+
     private final AdministrationService administrationService;
 
     @Autowired
@@ -25,8 +30,63 @@ public class AdministrationController {
 
     // Do not want to create endpoint for each api call.
     @GetMapping("/test")
-    public Mono<Void> runSome() {
+    public Mono<Void> runOtherEndpoints() {
         return administrationService.runOtherEndpoints();
+    }
+
+    // change project_1 to:
+    // {
+    //  "id": "project_1"
+    //  "name": "ProjectA ProjectB" // add ProjectB to the name
+    // }
+    // {
+    //  "id": "project_2"
+    //  "name": "ProjectB"
+    // }
+    // {
+    //  "id": "project_3"
+    //  "name": "ProjectC"
+    // }
+    @GetMapping("/testFts")
+    public Mono<Void> runFtsEndpoints() {
+        return Mono
+                .defer(() -> {
+                    logger.info("fetch project_1");
+                    return administrationService.
+                            ftsMatchQueries("ProjectA")
+                            .collectList();
+                })
+                .then(Mono.defer(() -> {
+                            logger.info("fetch project_1 and project_2");
+                            return administrationService
+                                    .ftsMatchQueries("ProjectB")
+                                    .collectList();
+                        }
+                ))
+                .then(Mono.defer(() -> {
+                            // this match query searches by terms!
+                            logger.info("fetch project_1 and project_2");
+                            return administrationService
+                                    .ftsMatchQueries("ProjectA ProjectB")
+                                    .collectList();
+                        }
+                ))
+                .then(Mono.defer(() -> {
+                            // this match query searches by whole phrase!
+                            logger.info("fetch project_1");
+                            return administrationService
+                                    .ftsMatchPhraseQueries("ProjectA ProjectB")
+                                    .collectList();
+                        }
+                ))
+                .then(Mono.defer(() -> {
+                            logger.info("fetch project_1 and project_2");
+                            return administrationService
+                                    .ftsMatchPhraseQueries("ProjectB")
+                                    .collectList();
+                        }
+                ))
+                .then();
     }
 
     @PostMapping(path = "/projects")
